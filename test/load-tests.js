@@ -19,12 +19,6 @@
 const fs = require('fs');
 const path = require('path');
 
-describe('In-Page Browser Tests', function() {
-  it('should run the in-page browser tests', function() {
-
-  });
-});
-
 describe('Selenium Tests', function() {
   const seleniumTestFiles = fs.readdirSync(path.join(__dirname, 'selenium'));
   seleniumTestFiles.forEach((testFile) => {
