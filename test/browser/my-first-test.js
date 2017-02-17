@@ -1,23 +1,34 @@
-describe('Service Worker Suite', function() {
-  beforeEach(function() {
-    return navigator.serviceWorker.getRegistrations()
-    .then((registrations) => {
-      const unregisterPromise = registrations.map((registration) => {
-        return registration.unregister();
-      });
-      return Promise.all(unregisterPromise);
-    });
+/**
+ * Copyright 2016 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * See the License for the specific language governing permissions and
+ * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * limitations under the License.
+ */
+
+'use strict';
+
+describe('First Browser Test Suite', function() {
+  before(function() {
+    return window.__testCleanup();
   });
 
-  it('should register a service worker and cache file on install', function() {
+  afterEach(function() {
+    return window.__testCleanup();
+  });
+
+  it('should register my-first-sw.js and cache file on install', function() {
     return navigator.serviceWorker.register('/test/static/my-first-sw.js')
     .then((reg) => {
       return window.__waitForSWState(reg, 'installed');
-    })
-    .then(() => {
-      /** const iframeEl = document.createElement('iframe');
-      iframeEl.src = '/test/static/index.html';
-      document.body.appendChild(iframeEl);**/
     })
     .then(() => {
       return caches.match('/__test/example')

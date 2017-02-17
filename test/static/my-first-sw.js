@@ -1,5 +1,4 @@
-/* eslint-env serviceworker */
-/* globals Request, Response */
+/* eslint-env serviceworker, browser */
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', () => self.clients.claim());
@@ -13,8 +12,4 @@ self.addEventListener('install', (event) => {
     );
   });
   event.waitUntil(promiseChain);
-});
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(new Response('Hi from sw fetch event'));
 });

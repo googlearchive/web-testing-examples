@@ -10,7 +10,7 @@ window.__waitForSWState = (registration, desiredState) => {
     const stateListener = (evt) => {
       if (evt.target.state === desiredState) {
         serviceWorker.removeEventListener('statechange', stateListener);
-        return resolve();
+        return resolve(serviceWorker);
       }
 
       if (evt.target.state === 'redundant') {

@@ -1,0 +1,12 @@
+{
+  "env": {
+    "serviceworker": true,
+    "browser": true
+  },
+  "globals": {
+    "PushEvent": true
+  },
+  "rules": {
+    "no-console": 0
+  }
+}

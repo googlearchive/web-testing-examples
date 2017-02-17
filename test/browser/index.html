@@ -37,10 +37,12 @@
   <script>mocha.setup('bdd')</script>
 
   <!-- This Projects Libraries / Pieces of Code Here -->
-  <script src="/test/browser/utils/wait-for-sw-state.js"></script>
+  <script src="/test/utils/wait-for-sw-state.js"></script>
+  <script src="/test/utils/sw-cache-cleanup.js"></script>
 
   <!-- This Projects Unit Tests Here -->
   <script src="/test/browser/my-first-test.js"></script>
+  <script src="/test/browser/run-sw-tests.js"></script>
 
   <script>
     mocha.checkLeaks();
