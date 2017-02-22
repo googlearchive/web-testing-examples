@@ -17,11 +17,11 @@
 'use strict';
 
 describe('First Browser Test Suite', function() {
-  before(function() {
+  beforeEach(function() {
     return window.__testCleanup();
   });
 
-  afterEach(function() {
+  after(function() {
     return window.__testCleanup();
   });
 
