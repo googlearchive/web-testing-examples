@@ -25,53 +25,49 @@
  * not perform install or activate steps and it's state is normally incorrect.
  */
 
-describe('Test Registering Service Worker', function() {
+describe('Test Demo Site SW Registration', function() {
   const sinonStubs = [];
 
-  let fakeRegHandler;
-  const registerStubCallback = (path, options) => {
-    // Allow the individual tests to define fakeRegHandler
-    return fakeRegHandler(path, options);
-  };
-
-  const stubSWRegister = () => {
-    const registerStub = sinon.stub(navigator.serviceWorker, 'register',
-      registerStubCallback);
-    sinonStubs.push(registerStub);
-  };
-
-  before(function() {
-    // We stub the register function of service worker to ensure we test both
-    // good and bad paths and to avoid actually registering a service worker
-    // which we can't unregister between tests.
-    return stubSWRegister();
-  });
-
-  after(function() {
+  afterEach(function() {
     sinonStubs.forEach((stub) => {
       stub.restore();
     });
   });
 
   it('should register service worker', function() {
-    fakeRegHandler = (path, options) => {
+    // Create a method that will be our fakes serviceWorker.register()
+    // function.
+    const fakeRegHandler = (path, options) => {
       path.should.equal(self.__demoSite.constants.serviceWorkerPath);
       (options === undefined).should.equal(true);
 
       return Promise.resolve();
     };
 
+    // Use sinon to stub out our fake register call.
+    const registerStub = sinon.stub(navigator.serviceWorker, 'register',
+      fakeRegHandler);
+    sinonStubs.push(registerStub);
+
     return self.__demoSite.registerServiceWorker();
   });
 
   it('should handle failing service worker registration', function() {
     const INJECTED_ERROR_MSG = 'Inject Error Message.';
-    fakeRegHandler = (path, options) => {
+
+    // Create a method that will be our fakes serviceWorker.register()
+    // function.
+    const fakeRegHandler = (path, options) => {
       path.should.equal(self.__demoSite.constants.serviceWorkerPath);
       (options === undefined).should.equal(true);
 
       return Promise.reject(new Error(INJECTED_ERROR_MSG));
     };
+
+    // Use sinon to stub out our fake register call.
+    const registerStub = sinon.stub(navigator.serviceWorker, 'register',
+      fakeRegHandler);
+    sinonStubs.push(registerStub);
 
     return self.__demoSite.registerServiceWorker()
     .then(() => {

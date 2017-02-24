@@ -23,3 +23,15 @@ importScripts('./scripts/precache-site.js');
 self.addEventListener('install', (event) => {
   event.waitUntil(self.__demoSite.precacheSite());
 });
+
+self.addEventListener('fetch', (event) => {
+  const promiseChain = self.caches.match(event.request)
+  .then((cachedResponse) => {
+    if (cachedResponse) {
+      return cachedResponse;
+    } else {
+      return null;
+    }
+  });
+  event.respondWith(promiseChain);
+});

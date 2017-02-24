@@ -7,8 +7,13 @@ mocha.setup({
   reporter: null,
 });
 
-self.addEventListener('fetch', () => {
-  console.log('FETCH EVENT');
+self.addEventListener('fetch', (event) => {
+  const expectedUrl = new URL('/index.html', location).toString();
+  if (event.request.url === expectedUrl) {
+    event.respondWith(new Response('hello.'));
+  } else {
+    event.respondWith(null);
+  }
 });
 
 self.addEventListener('push', (event) => {
@@ -22,8 +27,13 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(promiseChain);
 });
 
-self.addEventListener('notificationclose', () => {
-  console.log('NOTIFICATION CLOSE EVENT');
+self.addEventListener('notificationclose', (event) => {
+  // Not sure what a developer would want to test
+  // so add a global flag and check it's set so
+  // we know the fake event was received and did
+  // something.
+  self._notification_close_result = true;
+  event.waitUntil(Promise.resolve());
 });
 
 describe('SW Events Test Suite', function() {
@@ -42,13 +52,6 @@ describe('SW Events Test Suite', function() {
 
   after(function() {
     return clearNotifications();
-  });
-
-  it('should be able to make a fetch event', function() {
-    const event = new FetchEvent('fetch', {
-      request: new Request('/index.html'),
-    });
-    self.dispatchEvent(event);
   });
 
   it('should be able to test a push event', function() {
@@ -84,6 +87,37 @@ describe('SW Events Test Suite', function() {
 
       if (notifications[0].body !== pushData.body) {
         throw new Error('Unexpected notification body.');
+      }
+    });
+  });
+
+  it('should be able to make a fetch event', function() {
+    return new Promise((resolve, reject) => {
+      const event = new FetchEvent('fetch', {
+        request: new Request('/index.html'),
+      });
+      event.respondWith = (promiseChain) => {
+        if (promiseChain) {
+          // Check if promise was returned - otherise
+          // it could be a response
+          if (promiseChain instanceof Promise) {
+            promiseChain.then(resolve, reject);
+          } else {
+            resolve(promiseChain);
+          }
+          return;
+        }
+
+        resolve();
+      };
+      self.dispatchEvent(event);
+    })
+    .then((response) => {
+      return response.text();
+    })
+    .then((response) => {
+      if (response !== 'hello.') {
+        throw new Error('Unexpected response.');
       }
     });
   });
@@ -125,10 +159,25 @@ describe('SW Events Test Suite', function() {
       return self.registration.getNotifications();
     })
     .then((notifications) => {
-      const event = new NotificationEvent('notificationclose', {
-        notification: notifications[0],
+      return new Promise((resolve, reject) => {
+        const event = new NotificationEvent('notificationclose', {
+          notification: notifications[0],
+        });
+        event.waitUntil = (promiseChain) => {
+          if (promiseChain) {
+            promiseChain.then(resolve, reject);
+            return;
+          }
+
+          resolve();
+        };
+        self.dispatchEvent(event);
       });
-      self.dispatchEvent(event);
+    })
+    .then(() => {
+      if (self._notification_close_result !== true) {
+        throw new Error('Notification close result not set.');
+      }
     });
   });
 });

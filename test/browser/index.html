@@ -39,14 +39,24 @@
   <!-- This Projects Libraries / Pieces of Code Here -->
   <script src="/test/utils/wait-for-sw-state.js"></script>
   <script src="/test/utils/sw-test-cleanup.js"></script>
+  <script src="/demo-site/scripts/precache-site.js"></script>
+  <script src="/demo-site/scripts/register-sw.js"></script>
 
   <!-- This Projects Unit Tests Here -->
   <script src="/test/browser/first-browser-test.js"></script>
   <script src="/test/browser/run-sw-tests.js"></script>
+  <script src="/test/browser/demo-site-sw-register.js"></script>
+  <script src="/test/browser/demo-site-sw-cache.js"></script>
 
   <script>
     mocha.checkLeaks();
-    mocha.run();
+    const runResults = mocha.run();
+    runResults.on('end', () => {
+      window.__testResults = {
+        failures: runResults.failures,
+        total: runResults.total,
+      };
+    });
   </script>
 </body>
 </html>

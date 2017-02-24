@@ -24,7 +24,9 @@ const registerServiceWorker = require('../../demo-site/scripts/register-sw.js');
 // which is required by selenium-webdriver.
 require('chromedriver');
 
-describe('Register SW', function() {
+require('chai').should();
+
+describe('Test Demo Site Offline', function() {
   // Selenium-webdriver tests are flakey and take some time.
   // Account for this with retries and timeouts.
   this.timeout(5 * 60 * 1000);
@@ -43,12 +45,6 @@ describe('Register SW', function() {
       driver.manage().timeouts().setScriptTimeout(5 * 1000);
     });
   };
-  before(function() {
-    return testServer.start()
-    .then((address) => {
-      testServerAddress = address;
-    });
-  });
 
   after(function() {
     return testServer.stop();
@@ -64,6 +60,12 @@ describe('Register SW', function() {
     // You *could* initialise the driver in the before step, but this
     // won't allow retries, resulting in flakier tests.
     return initDriver()
+    .then(() => {
+      return testServer.start();
+    })
+    .then((address) => {
+      testServerAddress = address;
+    })
     .then(() => {
       // Load the demo site in the browser
       return seleniumDriver.get(`${testServerAddress}/demo-site/`);
@@ -81,6 +83,7 @@ describe('Register SW', function() {
             const serviceWorker = registration.active ||
               registration.installing ||
               registration.waiting;
+
             // Check that the registration has a service worker.
             if (!serviceWorker) {
               return cb(false);
@@ -113,12 +116,7 @@ describe('Register SW', function() {
       });
     })
     .then((browserUrl) => {
-      browserUrl.should.equal(testServerAddress);
-    })
-    .then(() => {
-      return new Promise((resolve) => {
-        setTimeout(resolve, 15000);
-      });
+      browserUrl.should.equal(`${testServerAddress}/demo-site/`);
     });
   });
 });

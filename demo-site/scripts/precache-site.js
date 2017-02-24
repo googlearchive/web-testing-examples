@@ -18,7 +18,7 @@
 
 const CACHE_NAME = 'demo-site-cache';
 const FILES_TO_CACHE = [
-  '/demo-site/index.html',
+  '/demo-site/',
 ];
 
 const precacheSite = () => {

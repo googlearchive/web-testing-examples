@@ -5,5 +5,8 @@
   },
   "globals": {
     "chai": true
+  },
+  "rules": {
+    "no-invalid-this": 0
   }
 }

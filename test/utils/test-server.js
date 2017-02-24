@@ -30,6 +30,9 @@ class TestServer {
     }
 
     const addressInfo = this._server.address();
+    if (!addressInfo) {
+      throw new Error('Unable to get server address.');
+    }
     return `http://${addressInfo.address}:${addressInfo.port}`;
   }
 
@@ -76,7 +79,10 @@ class TestServer {
     }
 
     return new Promise((resolve) => {
-      this._server.close(resolve);
+      this._server.close(() => {
+        this._server = null;
+        resolve();
+      });
     });
   }
 }

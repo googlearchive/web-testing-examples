@@ -27,7 +27,7 @@ const clearAllCaches = () => {
   });
 };
 
-describe('Test Caching Code', function() {
+describe('Test Demo Site Caching', function() {
   beforeEach(function() {
     return clearAllCaches();
   });
@@ -36,7 +36,7 @@ describe('Test Caching Code', function() {
     return clearAllCaches();
   });
 
-  it('should have the cache name and files defined', function() {
+  it('should be able to access self.__demoSite from window', function() {
     self.__demoSite.constants.cacheName.should.equal('demo-site-cache');
     self.__demoSite.constants.filesToCache.length.should.equal(1);
   });

@@ -1,4 +1,4 @@
-describe('Run SW Unit Tests', function() {
+describe('Run Service Worker Tests', function() {
   before(function() {
     return window.__testCleanup();
   });
@@ -6,6 +6,13 @@ describe('Run SW Unit Tests', function() {
   afterEach(function() {
     return window.__testCleanup();
   });
+
+  const handleTestResults = (results) => {
+    if (results.failures > 0) {
+      const pluralFailures = results.failures > 1 ? 's' : '';
+      throw new Error(`${results.failures} failing test${pluralFailures}.`);
+    }
+  };
 
   const sendMessage = (serviceWorker, message) => {
     return new Promise(function(resolve, reject) {
@@ -30,12 +37,7 @@ describe('Run SW Unit Tests', function() {
     .then((serviceWorker) => {
       return sendMessage(serviceWorker, 'run-tests');
     })
-    .then((results) => {
-      if (results.failures > 0) {
-        throw new Error(`${results.failures} failures out of ` +
-          `${results.total} tests`);
-      }
-    });
+    .then(handleTestResults);
   });
 
   it('should run sw-events.js unit tests', function() {
@@ -46,27 +48,6 @@ describe('Run SW Unit Tests', function() {
     .then((serviceWorker) => {
       return sendMessage(serviceWorker, 'run-tests');
     })
-    .then((results) => {
-      if (results.failures > 0) {
-        throw new Error(`${results.failures} failures out of ` +
-          `${results.total} tests`);
-      }
-    });
-  });
-
-  it('should run sw-structure-test.js unit tests', function() {
-    return navigator.serviceWorker.register('/test/sw/sw-structure-test.js')
-    .then((reg) => {
-      return window.__waitForSWState(reg, 'activated');
-    })
-    .then((serviceWorker) => {
-      return sendMessage(serviceWorker, 'run-tests');
-    })
-    .then((results) => {
-      if (results.failures > 0) {
-        throw new Error(`${results.failures} failures out of ` +
-          `${results.total} tests`);
-      }
-    });
+    .then(handleTestResults);
   });
 });
